@@ -10,7 +10,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write
   issues: write
 
 jobs:
@@ -43,12 +43,16 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            await github.rest.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.payload.pull_request.number,
-              labels: ["needs-intake-fix"],
-            });
+            try {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                labels: ["needs-intake-fix"],
+              });
+            } catch (error) {
+              console.log(`Warning: unable to add needs-intake-fix label: ${error.message}`);
+            }
 
       - name: Remove intake label when structure is complete
         if: steps.intake.outputs.needs_fix != 'true'
@@ -64,7 +68,7 @@ jobs:
               });
             } catch (error) {
               if (error.status !== 404) {
-                throw error;
+                console.log(`Warning: unable to remove needs-intake-fix label: ${error.message}`);
               }
             }
 

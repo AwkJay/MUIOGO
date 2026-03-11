@@ -254,21 +254,25 @@ def validate_exception_rationale(body: str, errors: list[str]) -> None:
 
 
 def validate_issue_body(issue_body: str, errors: list[str]) -> None:
-    related_issues = require_section(issue_body, "Related issues reviewed", errors, "Linked issue")
-    related_prs = require_section(issue_body, "Related PRs reviewed", errors, "Linked issue")
-    overlap = require_section(issue_body, "Overlap classification", errors, "Linked issue")
-    still_needed = require_section(issue_body, "Why this issue is still needed", errors, "Linked issue")
-    proposed_track = require_section(issue_body, "Proposed track", errors, "Linked issue")
+    if not cleaned_lines(issue_body):
+        errors.append("Linked issue body must not be empty")
+        return
 
-    if related_issues is not None:
+    related_issues = extract_section(issue_body, "Related issues reviewed")
+    related_prs = extract_section(issue_body, "Related PRs reviewed")
+    overlap = extract_section(issue_body, "Overlap classification")
+    still_needed = extract_section(issue_body, "Why this issue is still needed")
+    proposed_track = extract_section(issue_body, "Proposed track")
+
+    if related_issues and not looks_blank(related_issues):
         validate_issue_related_work(related_issues, "Related issues reviewed", errors)
-    if related_prs is not None:
+    if related_prs and not looks_blank(related_prs):
         validate_issue_related_work(related_prs, "Related PRs reviewed", errors)
-    if overlap is not None:
+    if overlap and not looks_blank(overlap):
         validate_issue_overlap(overlap, errors)
-    if still_needed is not None:
+    if still_needed and not looks_blank(still_needed):
         validate_issue_reason(still_needed, "Why this issue is still needed", errors)
-    if proposed_track is not None:
+    if proposed_track and not looks_blank(proposed_track):
         validate_issue_track(proposed_track, errors)
 
 
