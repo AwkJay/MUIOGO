@@ -1,7 +1,7 @@
 import shutil
 from flask import Blueprint, request, jsonify, send_file, after_this_request
 from zipfile import ZipFile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from werkzeug.utils import secure_filename
 import os, time, json, glob
 
@@ -214,8 +214,10 @@ def backupCase():
                 for filename in filenames:
                     if filename != 'lp.lp':
                         filePath = os.path.join(folderName, filename)
-                        # store relative path so ZIP is portable across machines
-                        arcname = os.path.join(case, os.path.relpath(filePath, str(casePath)))
+                        # PurePosixPath enforces forward-slash separators in the ZIP
+                        # regardless of host OS, required by the ZIP spec and ensures
+                        # Windows-created backups restore correctly on Linux/macOS.
+                        arcname = str(PurePosixPath(case) / os.path.relpath(filePath, str(casePath)).replace('\\', '/'))
                         zipObj.write(filePath, arcname=arcname)
 
             #osemosys 2.1 backup only input files
