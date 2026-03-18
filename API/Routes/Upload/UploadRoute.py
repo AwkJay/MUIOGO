@@ -3,9 +3,8 @@ from flask import Blueprint, request, jsonify, send_file, after_this_request
 from zipfile import ZipFile
 from pathlib import Path
 from werkzeug.utils import secure_filename
-import os, time, json, glob
+import os, json, glob
 
-from threading import Thread
 
 from Classes.Base import Config
 from Classes.Base.FileClass import File
@@ -180,20 +179,6 @@ def updateTimeslices_OnlyTs(casename):
     RYTTsPath.write_text(RYTTsPath.read_text().replace('Timeslice', 'TsId'))
     RYCTsPath = Path(Config.DATA_STORAGE, casename, 'RYCTs.json')
     RYCTsPath.write_text(RYCTsPath.read_text().replace('Timeslice', 'TsId'))
-##############################################################Multithreading example#########################3
-class Download(Thread):
-    def __init__(self, request, zippedFile):
-        Thread.__init__(self)
-        self.request = request
-        self.zippedFile = zippedFile
-
-    def run(self):
-        print("wait few seconds for download to finish")
-        time.sleep(20)
-        #print(self.request)
-        #remove zipped file
-        os.remove(self.zippedFile)
-        print("Deletion of zip archive done!")
 
 
 @upload_api.route("/backupCase", methods=['GET'])
@@ -228,8 +213,13 @@ def backupCase():
             #             # Add file to zip
             #             zipObj.write(filePath)   
 
-        thread_a = Download(request.__copy__(), zippedFile)
-        thread_a.start()
+        @after_this_request
+        def remove_zip(response):
+            try:
+                os.remove(zippedFile)
+            except OSError:
+                pass
+            return response
 
         return send_file(zippedFile.resolve(), as_attachment=True)
 
