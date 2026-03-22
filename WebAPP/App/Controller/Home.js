@@ -95,8 +95,7 @@ export default class Home {
             })
         });
 
-        $("#cases").off('click.homeEdit', '.editPS');
-        $("#cases").on('click.homeEdit', '.editPS', function(e) {
+        $("#cases").on('click', '.editPS', function(e) {
             e.preventDefault();
             e.stopImmediatePropagation();
             var casename = $(this).attr('data-ps');
@@ -151,8 +150,7 @@ export default class Home {
         });
 
         //get descrition
-        $("#cases").off('click.homeDescription', '.descriptionPS');
-        $("#cases").on('click.homeDescription', '.descriptionPS', function(e){
+        $(document).delegate(".descriptionPS","click",function(e){
             //e.stopImmediatePropagation();
             var titleps = $(this).attr('data-ps');
             Base.getCaseDesc(titleps)
@@ -214,8 +212,7 @@ export default class Home {
         });
 
         //Search cases
-        $('#CaseSearch').off('keyup.homeSearch');
-        $('#CaseSearch').on('keyup.homeSearch', function () {
+        $('#CaseSearch').keyup(function () {
             var query = $.trim($('#CaseSearch').val()).toLowerCase();
             //console.log('query ', query)
             $('.selectCS').each(function () {
@@ -226,8 +223,7 @@ export default class Home {
             });
         })
 
-        $("#showLog").off('click.homeLog');
-        $("#showLog").on('click.homeLog', function (e) {
+        $("#showLog").click(function (e) {
             e.preventDefault();
             $('#definition').html(`
                 <h5>${DEF[model.pageID].title}</h5>
