@@ -367,6 +367,8 @@ export default class DataFile {
 
         $("#osy-generateDataFile").off('click');
         $("#osy-generateDataFile").on('click', function (event) {
+            const $genBtn = $("#osy-generateDataFile");
+            $genBtn.prop("disabled", true);
             Pace.restart();
             Message.loaderStart('Generating data file!')
             Osemosys.generateDataFile(model.casename, model.cs)
@@ -408,11 +410,16 @@ export default class DataFile {
                 Message.loaderEnd();
                 Message.bigBoxDanger('Error message', error, null);
             })
+            .finally(() => {
+                $genBtn.prop("disabled", false);
+            });
         });
 
 
         $("#osy-run").off('click');
         $("#osy-run").on('click', function (event) {
+            const $runBtn = $("#osy-run");
+            $runBtn.prop("disabled", true);
             Pace.restart();
             Message.loaderStart('Optimization in process!')
             //promijenjeno da radimo samo sa cBCsolverom
@@ -490,6 +497,9 @@ export default class DataFile {
                 Message.loaderEnd();
                 Message.bigBoxDanger('Error message', error, null);
             })
+            .finally(() => {
+                $runBtn.prop("disabled", false);
+            });
         });
 
         //$("#osy-Cases").off('click');
@@ -787,6 +797,8 @@ export default class DataFile {
 
         $("#osy-batchRun").off('click');
         $("#osy-batchRun").on('click', function (event) {
+            const $batchBtn = $("#osy-batchRun");
+            $batchBtn.prop("disabled", true);
             //console.log('BATCH RUN')
             Pace.restart();
             Message.loaderStart('BATCH RUN! Plese wait...');
@@ -829,6 +841,9 @@ export default class DataFile {
             .catch(error => {
                 Message.bigBoxDanger(error)
             })
+            .finally(() => {
+                $batchBtn.prop("disabled", false);
+            });
 
         });
 
